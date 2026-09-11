@@ -1,0 +1,11 @@
+# Build output
+build*/
+_deps/
+
+# CPack output
+*.zip
+*.tar.gz
+
+# Editor / OS noise
+.vscode/
+.DS_Store

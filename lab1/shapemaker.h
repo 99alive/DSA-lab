@@ -1,8 +1,6 @@
 #ifndef SHAPEMAKER_H
 #define SHAPEMAKER_H
 
-#include <string>
-
 class ShapeMaker {
 public:
     ShapeMaker();
@@ -29,8 +27,6 @@ private:
     int canvasWidth;
     int canvasHeight;
     char drawingSymbol;
-
-    void PrintCanvasRow(const std::string& row) const;
 };
 
 #endif

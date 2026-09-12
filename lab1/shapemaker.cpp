@@ -1,14 +1,15 @@
+// shapemaker.cpp
+// Lab 1 - ShapeMaker class
+// Implementation file for the ShapeMaker class plus a main function
+// that acts as a test driver and calls every member function.
+
+#include <iostream>
+#include <cmath>
 #include "shapemaker.h"
 
-#include <algorithm>
-#include <cmath>
-#include <iostream>
-#include <stdexcept>
+using namespace std;
 
-ShapeMaker::ShapeMaker()
-{
-    Initialize();
-}
+// ---------------- Initialize ----------------
 
 void ShapeMaker::Initialize()
 {
@@ -17,12 +18,14 @@ void ShapeMaker::Initialize()
     drawingSymbol = '*';
 }
 
-void ShapeMaker::Initialize(int newCanvasWidth, int newCanvasHeight, char newDrawingSymbol)
+void ShapeMaker::Initialize(int width, int height, char symbol)
 {
-    SetCanvasWidth(newCanvasWidth);
-    SetCanvasHeight(newCanvasHeight);
-    SetDrawingSymbol(newDrawingSymbol);
+    canvasWidth = width;
+    canvasHeight = height;
+    drawingSymbol = symbol;
 }
+
+// ---------------- Getters ----------------
 
 int ShapeMaker::GetCanvasWidth() const
 {
@@ -39,121 +42,232 @@ char ShapeMaker::GetDrawingSymbol() const
     return drawingSymbol;
 }
 
-void ShapeMaker::SetCanvasWidth(int newCanvasWidth)
+// ---------------- Setters ----------------
+
+void ShapeMaker::SetCanvasWidth(int width)
 {
-    if (newCanvasWidth < 1) {
-        throw std::invalid_argument("canvas width must be positive");
-    }
-    canvasWidth = newCanvasWidth;
+    canvasWidth = width;
 }
 
-void ShapeMaker::SetCanvasHeight(int newCanvasHeight)
+void ShapeMaker::SetCanvasHeight(int height)
 {
-    if (newCanvasHeight < 1) {
-        throw std::invalid_argument("canvas height must be positive");
-    }
-    canvasHeight = newCanvasHeight;
+    canvasHeight = height;
 }
 
-void ShapeMaker::SetDrawingSymbol(char newDrawingSymbol)
+void ShapeMaker::SetDrawingSymbol(char symbol)
 {
-    drawingSymbol = newDrawingSymbol;
+    drawingSymbol = symbol;
 }
 
+// ---------------- Drawing functions ----------------
+
+// Draws a horizontal line across the middle row of the canvas.
+// The rows above and below the line are left blank.
 void ShapeMaker::DrawHorizontalLine() const
 {
-    std::cout << std::string(canvasWidth, drawingSymbol) << '\n';
+    int middleRow = canvasHeight / 2;
+
+    for (int row = 0; row < canvasHeight; row++)
+    {
+        if (row == middleRow)
+        {
+            for (int col = 0; col < canvasWidth; col++)
+            {
+                cout << drawingSymbol;
+            }
+        }
+        cout << endl;
+    }
 }
 
+// Draws a vertical line down the middle column of the canvas.
 void ShapeMaker::DrawVerticalLine() const
 {
-    for (int row = 0; row < canvasHeight; ++row) {
-        std::cout << drawingSymbol << '\n';
+    int middleCol = canvasWidth / 2;
+
+    for (int row = 0; row < canvasHeight; row++)
+    {
+        // print spaces up to the middle, then the symbol
+        for (int col = 0; col < middleCol; col++)
+        {
+            cout << ' ';
+        }
+        cout << drawingSymbol << endl;
     }
 }
 
+// Draws a solid square that is canvasWidth wide and canvasWidth tall.
 void ShapeMaker::DrawFilledSquare() const
 {
-    int squareSize = std::min(canvasWidth, canvasHeight);
-    std::string row(squareSize, drawingSymbol);
-    for (int line = 0; line < squareSize; ++line) {
-        std::cout << row << '\n';
+    for (int row = 0; row < canvasWidth; row++)
+    {
+        for (int col = 0; col < canvasWidth; col++)
+        {
+            cout << drawingSymbol;
+        }
+        cout << endl;
     }
 }
 
+// Draws just the outline of a square that is canvasWidth wide.
 void ShapeMaker::DrawOpenSquare() const
 {
-    int squareSize = std::min(canvasWidth, canvasHeight);
-    std::string border(squareSize, drawingSymbol);
-    std::string middle = drawingSymbol + std::string(squareSize - 2, ' ') + drawingSymbol;
-
-    for (int line = 0; line < squareSize; ++line) {
-        if (line == 0 || line == squareSize - 1 || squareSize < 3) {
-            std::cout << border << '\n';
-        } else {
-            std::cout << middle << '\n';
+    for (int row = 0; row < canvasWidth; row++)
+    {
+        for (int col = 0; col < canvasWidth; col++)
+        {
+            // only print the symbol on the edges
+            if (row == 0 || row == canvasWidth - 1 ||
+                col == 0 || col == canvasWidth - 1)
+            {
+                cout << drawingSymbol;
+            }
+            else
+            {
+                cout << ' ';
+            }
         }
+        cout << endl;
     }
 }
 
+// Draws a smiley face inside a square "block head".
+// The eyes are about 1/3 of the way down, the nose is in the
+// center and the mouth is about 2/3 of the way down, so the face
+// still looks right when the canvas size changes.
 void ShapeMaker::DrawSmileyFace() const
 {
-    int size = std::min(canvasWidth, canvasHeight);
-    for (int row = 0; row < size; ++row) {
-        for (int column = 0; column < size; ++column) {
-            bool border = row == 0 || row == size - 1 || column == 0 || column == size - 1;
-            bool leftEye = row == size / 3 && column == size / 3;
-            bool rightEye = row == size / 3 && column == size - size / 3 - 1;
-            bool nose = row == size / 2 && column == size / 2;
-            bool mouth = row == (2 * size) / 3 &&
-                         column >= size / 3 && column <= size - size / 3 - 1;
+    int size = canvasWidth;
+    int eyeRow = size / 3;
+    int leftEyeCol = size / 3;
+    int rightEyeCol = size - size / 3 - 1;
+    int noseRow = size / 2;
+    int noseCol = size / 2;
+    int mouthRow = (size * 2) / 3;
 
-            std::cout << ((border || leftEye || rightEye || nose || mouth) ? drawingSymbol : ' ');
+    for (int row = 0; row < size; row++)
+    {
+        for (int col = 0; col < size; col++)
+        {
+            bool onBorder = (row == 0 || row == size - 1 ||
+                             col == 0 || col == size - 1);
+            bool onEyes = (row == eyeRow &&
+                           (col == leftEyeCol || col == rightEyeCol));
+            bool onNose = (row == noseRow && col == noseCol);
+            bool onMouth = (row == mouthRow &&
+                            col >= leftEyeCol && col <= rightEyeCol);
+
+            if (onBorder || onEyes || onNose || onMouth)
+            {
+                cout << drawingSymbol;
+            }
+            else
+            {
+                cout << ' ';
+            }
         }
-        std::cout << '\n';
+        cout << endl;
     }
 }
 
+// BONUS: Draws the outline of a circle as wide as the canvas.
+// For every position I find its distance from the center using the
+// distance formula. If that distance is close to the radius the
+// position is on the edge of the circle so I print the symbol.
 void ShapeMaker::DrawOpenCircle() const
 {
-    int size = std::min(canvasWidth, canvasHeight);
+    int size = canvasWidth;
     double center = (size - 1) / 2.0;
     double radius = center;
 
-    for (int row = 0; row < size; ++row) {
-        for (int column = 0; column < size; ++column) {
-            double distance = std::hypot(column - center, row - center);
-            std::cout << (std::abs(distance - radius) < 0.65 ? drawingSymbol : ' ');
+    for (int row = 0; row < size; row++)
+    {
+        for (int col = 0; col < size; col++)
+        {
+            double dx = col - center;
+            double dy = row - center;
+            double distance = sqrt(dx * dx + dy * dy);
+
+            if (fabs(distance - radius) < 0.65)
+            {
+                cout << drawingSymbol;
+            }
+            else
+            {
+                cout << ' ';
+            }
         }
-        std::cout << '\n';
+        cout << endl;
     }
 }
 
+// ---------------- Test driver ----------------
+
 int main()
 {
-    ShapeMaker shapeMaker;
+    ShapeMaker shape;
 
-    std::cout << "Horizontal line:\n";
-    shapeMaker.DrawHorizontalLine();
-    std::cout << "Vertical line:\n";
-    shapeMaker.DrawVerticalLine();
-    std::cout << "Filled square:\n";
-    shapeMaker.DrawFilledSquare();
-    std::cout << "Open square:\n";
-    shapeMaker.DrawOpenSquare();
-    std::cout << "Smiley face:\n";
-    shapeMaker.DrawSmileyFace();
-    std::cout << "Open circle:\n";
-    shapeMaker.DrawOpenCircle();
+    // start with the default canvas (21 x 21 and '*')
+    shape.Initialize();
 
-    shapeMaker.Initialize(9, 9, '#');
-    std::cout << "Configured canvas: " << shapeMaker.GetCanvasWidth() << "x"
-              << shapeMaker.GetCanvasHeight() << " using "
-              << shapeMaker.GetDrawingSymbol() << '\n';
-    shapeMaker.SetCanvasWidth(7);
-    shapeMaker.SetCanvasHeight(7);
-    shapeMaker.SetDrawingSymbol('+');
-    shapeMaker.DrawOpenSquare();
+    cout << "Canvas width: " << shape.GetCanvasWidth() << endl;
+    cout << "Canvas height: " << shape.GetCanvasHeight() << endl;
+    cout << "Drawing symbol: " << shape.GetDrawingSymbol() << endl;
+    cout << endl;
+
+    cout << "Horizontal line:" << endl;
+    shape.DrawHorizontalLine();
+    cout << endl;
+
+    cout << "Vertical line:" << endl;
+    shape.DrawVerticalLine();
+    cout << endl;
+
+    cout << "Filled square:" << endl;
+    shape.DrawFilledSquare();
+    cout << endl;
+
+    cout << "Open square:" << endl;
+    shape.DrawOpenSquare();
+    cout << endl;
+
+    cout << "Smiley face:" << endl;
+    shape.DrawSmileyFace();
+    cout << endl;
+
+    cout << "Open circle (bonus):" << endl;
+    shape.DrawOpenCircle();
+    cout << endl;
+
+    // now try a different canvas using the other Initialize
+    shape.Initialize(11, 11, '#');
+    cout << "After Initialize(11, 11, '#'):" << endl;
+    cout << "Canvas width: " << shape.GetCanvasWidth() << endl;
+    cout << "Canvas height: " << shape.GetCanvasHeight() << endl;
+    cout << "Drawing symbol: " << shape.GetDrawingSymbol() << endl;
+    cout << endl;
+
+    cout << "Smiley face:" << endl;
+    shape.DrawSmileyFace();
+    cout << endl;
+
+    // and change things one at a time with the setters
+    shape.SetCanvasWidth(9);
+    shape.SetCanvasHeight(5);
+    shape.SetDrawingSymbol('+');
+    cout << "After setters (9 x 5 and '+'):" << endl;
+    cout << "Canvas width: " << shape.GetCanvasWidth() << endl;
+    cout << "Canvas height: " << shape.GetCanvasHeight() << endl;
+    cout << "Drawing symbol: " << shape.GetDrawingSymbol() << endl;
+    cout << endl;
+
+    cout << "Horizontal line:" << endl;
+    shape.DrawHorizontalLine();
+    cout << endl;
+
+    cout << "Open square:" << endl;
+    shape.DrawOpenSquare();
+    cout << endl;
 
     return 0;
 }

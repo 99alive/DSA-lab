@@ -1,78 +1,88 @@
 #pragma once
-
-#include "csv.hpp"
 #include "person.hpp"
-
+#include "csv.hpp"
 #include <vector>
 
 class Student : public Person {
-    int grad_year_;
-    std::vector<std::string> courses_;
-
+  int grad_year_;
+  std::vector<std::string> courses_;
 public:
-    Student(int id, std::string name, std::string email, int grad_year,
-            std::vector<std::string> courses = {})
-        : Person(id, std::move(name), std::move(email)),
-          grad_year_(grad_year), courses_(std::move(courses))
-    {
-        if (grad_year_ < 2000) {
-            throw ValidationError("grad_year too small");
-        }
+  Student(int id, std::string name, std::string email, int grad_year,
+          std::vector<std::string> courses = {})
+    : Person(id, std::move(name), std::move(email)),
+      grad_year_(grad_year), courses_(std::move(courses)) {
+    if (grad_year_ < 2000) throw ValidationError("grad_year too small");
+  }
+
+  std::string role() const override { return "Student"; }
+
+  nlohmann::json to_json() const override {
+    return {
+      {"role", role()},
+      {"id", id_},
+      {"name", name_},
+      {"email", email_},
+      {"grad_year", grad_year_},
+      {"courses", courses_}
+    };
+  }
+
+  YAML::Node to_yaml() const override {
+    YAML::Node n;
+    n["role"] = role();
+    n["id"] = id_;
+    n["name"] = name_;
+    n["email"] = email_;
+    n["grad_year"] = grad_year_;
+    for (const auto& c : courses_) n["courses"].push_back(c);
+    return n;
+  }
+
+  std::string csv_header() const override {
+    return "role,id,name,email,grad_year,courses"; // courses joined by ';'
+  }
+
+  std::string csv_row() const override {
+    std::string joined;
+    for (size_t i=0;i<courses_.size();++i) {
+      if (i) joined+=';';
+      joined += courses_[i];
+    }
+    return csv_escape(role()) + "," + std::to_string(id_) + "," +
+           csv_escape(name_) + "," + csv_escape(email_) + "," +
+           std::to_string(grad_year_) + "," + csv_escape(joined);
+  }
+
+  // Challenge extension 2: round-trip parsing (JSON -> Student).
+  // I check every field myself before calling the constructor so a bad
+  // JSON object gives a ValidationError with a clear message instead of
+  // a json library exception.
+  static Student from_json(const nlohmann::json& j) {
+    if (!j.is_object()) throw ValidationError("Student JSON must be an object");
+    if (!j.contains("role") || j["role"] != "Student")
+      throw ValidationError("role must be Student");
+    if (!j.contains("id") || !j["id"].is_number_integer())
+      throw ValidationError("id is missing or not an integer");
+    if (!j.contains("name") || !j["name"].is_string())
+      throw ValidationError("name is missing or not a string");
+    if (!j.contains("email") || !j["email"].is_string())
+      throw ValidationError("email is missing or not a string");
+    if (!j.contains("grad_year") || !j["grad_year"].is_number_integer())
+      throw ValidationError("grad_year is missing or not an integer");
+
+    // courses is optional, but if it is there it has to be a list of strings
+    std::vector<std::string> courses;
+    if (j.contains("courses")) {
+      if (!j["courses"].is_array()) throw ValidationError("courses must be an array");
+      for (const auto& c : j["courses"]) {
+        if (!c.is_string()) throw ValidationError("each course must be a string");
+        courses.push_back(c.get<std::string>());
+      }
     }
 
-    static Student from_json(const nlohmann::json& value)
-    {
-        try {
-            if (value.at("role") != "Student") {
-                throw ValidationError("JSON role is not Student");
-            }
-            return Student(value.at("id").get<int>(), value.at("name").get<std::string>(),
-                           value.at("email").get<std::string>(), value.at("grad_year").get<int>(),
-                           value.value("courses", std::vector<std::string>{}));
-        } catch (const ValidationError&) {
-            throw;
-        } catch (const std::exception& error) {
-            throw SerializationError(std::string("Invalid Student JSON: ") + error.what());
-        }
-    }
-
-    std::string role() const override { return "Student"; }
-
-    nlohmann::json to_json() const override
-    {
-        return {{"role", role()}, {"id", id_}, {"name", name_}, {"email", email_},
-                {"grad_year", grad_year_}, {"courses", courses_}};
-    }
-
-    YAML::Node to_yaml() const override
-    {
-        YAML::Node node;
-        node["role"] = role();
-        node["id"] = id_;
-        node["name"] = name_;
-        node["email"] = email_;
-        node["grad_year"] = grad_year_;
-        for (const auto& course : courses_) {
-            node["courses"].push_back(course);
-        }
-        return node;
-    }
-
-    std::string csv_header() const override
-    {
-        return "role,id,name,email,grad_year,courses";
-    }
-
-    std::string csv_row() const override
-    {
-        std::string joined;
-        for (std::size_t index = 0; index < courses_.size(); ++index) {
-            if (index != 0) {
-                joined += ';';
-            }
-            joined += courses_[index];
-        }
-        return csv_escape(role()) + "," + std::to_string(id_) + "," + csv_escape(name_) + "," +
-               csv_escape(email_) + "," + std::to_string(grad_year_) + "," + csv_escape(joined);
-    }
+    // the constructor does the rest of the validation (id > 0, email format, ...)
+    return Student(j["id"].get<int>(), j["name"].get<std::string>(),
+                   j["email"].get<std::string>(), j["grad_year"].get<int>(),
+                   std::move(courses));
+  }
 };

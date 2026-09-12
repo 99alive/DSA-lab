@@ -1,12 +1,14 @@
 # Lab 1 - ShapeMaker
 
-ShapeMaker draws text-art shapes using a configurable canvas size and drawing
-symbol. The class implementation and its test driver are in `shapemaker.cpp`;
-the class declaration is in `shapemaker.h`.
+For this lab I designed a ShapeMaker class with a UML diagram and then wrote it in C++. The class draws shapes on the screen using text characters, kind of like ASCII art.
 
-## Open in Codespaces
+## Files
 
-Open the `DSA-lab` repository in GitHub Codespaces, then run:
+- `shapemaker.h` - the specification file with the class declaration
+- `shapemaker.cpp` - the implementation of the class plus a `main` function that tests everything
+- `CMakeLists.txt` - so the lab builds the same way as lab 0
+
+## How to build and run
 
 ```bash
 cd lab1
@@ -15,25 +17,30 @@ cmake --build build
 ./build/ShapeMaker
 ```
 
-On Windows with a Visual Studio generator, run:
+Or just compile it straight with g++:
 
-```powershell
-cd lab1
-cmake -S . -B build
-cmake --build build --config Release
-.\build\Release\ShapeMaker.exe
+```bash
+g++ shapemaker.cpp -o shapemaker
+./shapemaker
 ```
 
-## Class responsibilities
+## What the class does
 
-The `ShapeMaker` class supports:
+The class keeps track of three things: the canvas width, the canvas height, and the symbol used for drawing. The defaults are 21 x 21 and `*`.
 
-- Default initialization to a 21 by 21 canvas using `*`.
-- Custom initialization and getters/setters for canvas width, height, and symbol.
-- Horizontal and vertical lines.
-- Filled and open squares.
-- A proportional block-style smiley face.
-- An open circle as the bonus operation.
+Member functions (from the CRC card):
 
-The `main` function calls every member function so it can be used as a simple
-test driver while developing the lab.
+- `Initialize()` - sets the defaults
+- `Initialize(width, height, symbol)` - sets custom values
+- `GetCanvasWidth()`, `GetCanvasHeight()`, `GetDrawingSymbol()`
+- `SetCanvasWidth()`, `SetCanvasHeight()`, `SetDrawingSymbol()`
+- `DrawHorizontalLine()` - a line across the middle row of the canvas
+- `DrawVerticalLine()` - a line down the middle column of the canvas
+- `DrawFilledSquare()` - a solid square as wide as the canvas
+- `DrawOpenSquare()` - just the outline of the square
+- `DrawSmileyFace()` - a face inside a square head, with the eyes, nose and mouth placed at 1/3, 1/2 and 2/3 of the way down so it still looks right at different sizes
+- `DrawOpenCircle()` - the bonus one. I used the distance formula from the center of the canvas and printed the symbol wherever the distance was close to the radius.
+
+## Testing
+
+The `main` function in `shapemaker.cpp` is the test driver. It creates one ShapeMaker object, calls `Initialize()`, prints the getters, draws all the shapes, then calls the other `Initialize` and each setter and draws a few shapes again to show the size and symbol actually change.

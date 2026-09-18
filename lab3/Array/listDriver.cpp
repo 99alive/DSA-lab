@@ -4,6 +4,7 @@
 #include <string>
 #include <cctype>
 #include <cstring>
+#include <cstdlib>   // for exit()
 
 #include "unsorted.h"
 

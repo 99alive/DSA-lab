@@ -19,10 +19,9 @@ g++ shapemaker.cpp -o shapemaker && ./shapemaker
 
 ## Lab 2 - Inheritance + JSON / YAML / CSV + Catch2
 
-This one is on its own branch.
+(Also on its own branch `lab/inheritance-serialization`, which is what was submitted.)
 
 ```bash
-git checkout lab/inheritance-serialization
 cd lab2
 cmake -S . -B build && cmake --build build     # first time downloads json, yaml-cpp and Catch2 (a few minutes)
 cd build && ctest --output-on-failure && ./app

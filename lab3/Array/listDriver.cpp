@@ -50,7 +50,7 @@ int main()
   inFile >> command;
 
   numCommands = 0;
-  while (command != "Quit")
+  while (command != "Quit" && inFile)   // added "&& inFile" so it stops at end of file instead of looping forever
   { 
     cout << command;
     if (command == "PutItem")

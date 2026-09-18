@@ -26,6 +26,7 @@ g++ -Wall listDriver.cpp unsorted.cpp ItemType.cpp -o listDriver
 1. `PrintList.cpp` would not compile. It has no `#include "unsorted.h"` and no `using namespace std`, so it does not know what `ofstream` or `UnsortedType` are. Also `listDriver.cpp` already has the same `PrintList` function at the bottom, so this file is not needed at all. I removed it.
 2. `listDriver.cpp` calls `exit(2)` but does not include `<cstdlib>`. It happened to work with g++ but I added the include to be safe.
 3. `MAX_ITEMS` in `ItemType.h` was 5. That is fine for `listData` but the new program needs to hold 50 numbers, so I changed it to 50. Because of this, the `IsFull` command in `listData` now prints `List is not full.` instead of `List is full.`
+4. A run-time error: if the command file does not end with `Quit` (or you give it the wrong file), `inFile >> command` fails at the end of the file, `command` never changes, and the `while` loop runs forever printing `Command not recognized`. I found this by accident when I answered the file name prompts in the wrong order and it wiped `listData`. I changed the loop to `while (command != "Quit" && inFile)` so it stops when the file runs out.
 
 Running `listDriver` with `listData` gives the expected output (see screenshots in the Word document).
 

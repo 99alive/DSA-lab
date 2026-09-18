@@ -308,6 +308,10 @@ public:
                     break;
                 case 'q':
                 case 'Q': endwin(); return;
+                case ERR:   // no keyboard available (e.g. input redirected) - give up
+                    endwin();
+                    std::cout << "ncurses could not read the keyboard." << std::endl;
+                    return;
             }
         }
 

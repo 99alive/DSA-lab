@@ -19,7 +19,7 @@ int main()
   string outFileName;    // output file external name
   string outputLabel;     
   string command;        // operation to be executed
-  
+ 
   int number;
   ItemType item;
   UnsortedType list;
@@ -35,27 +35,30 @@ int main()
   cout << "Enter name of output file; press return." << endl;
   cin  >> outFileName;
   outFile.open(outFileName.c_str());
-
+ 
   cout << "Enter name of test run; press return." << endl;
-  cin  >> outputLabel;
+  cin >> outputLabel;
+
   outFile << outputLabel << endl;
-  if (!inFile)
+  if(!inFile)
   {
-    cout << "file not found" << endl;
-	exit(2)
+    cout << "File not found." << endl;
+	exit(2);
   }
+
   inFile >> command;
 
   numCommands = 0;
   while (command != "Quit")
   { 
+    cout << command;
     if (command == "PutItem")
     {
       inFile >> number; 
       item.Initialize(number);
       list.PutItem(item);
       item.Print(outFile);
-      outFile << " is in list" << endl;
+      outFile << " is in list." << endl;
     }
     else if (command == "DeleteItem")
     {
@@ -63,17 +66,16 @@ int main()
       item.Initialize(number);
       list.DeleteItem(item);
       item.Print(outFile);
-      outFile << " is deleted" << endl;
+      outFile << " is deleted." << endl;
     }
     else if (command == "GetItem")
     {
       inFile >> number;
       item.Initialize(number);
       item = list.GetItem(item, found);
-      item.Print(outFile);
       if (found)
-        outFile << " found in list." << endl;
-      else outFile <<  " not in list."  << endl;  
+        outFile << number << " found in list." << endl;
+      else outFile << number  << " not in list."  << endl;  
     } 
     else if (command == "GetLength")  
       outFile << "Length is " << list.GetLength() << endl;
@@ -85,19 +87,18 @@ int main()
 	  list.MakeEmpty();
 	else if (command == "PrintList")
 	  PrintList(outFile, list);
-	else
-	  cout << command << " is not a valid command." << endl;
-	numCommands++;
+	else cout << " Command not recognized." << endl;
+    numCommands++;
     cout <<  " Command number " << numCommands << " completed." 
          << endl;
-    inFile >> command;
+    inFile >> command;   
   };
  
-  cout << "Testing completed."  << endl;
+  cout << "Quit" << endl << "Testing completed."  << endl;
   inFile.close();
   outFile.close();
   return 0;
-}
+};
 
 
 void PrintList(ofstream& dataFile, UnsortedType& list)
@@ -108,14 +109,17 @@ void PrintList(ofstream& dataFile, UnsortedType& list)
 {
   int length;
   ItemType item;
-
+  dataFile << "PrintList" << endl;
   list.ResetList();
   length = list.GetLength();
-  for (int counter = 1; counter <= length; counter++)
-  {
-    item = list.GetNextItem();
-    item.Print(dataFile);
-  }
+  if (length == 0)
+    dataFile << "List is empty.";
+  else
+    for (int counter = 1; counter <= length; counter++)
+    {
+      item = list.GetNextItem();
+      item.Print(dataFile);
+    }
   dataFile << endl;
 }
 

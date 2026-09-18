@@ -11,7 +11,10 @@ This lab uses the Chapter 3 textbook code for the Unsorted List ADT. I looked at
 | `listDriver.cpp` | The textbook test driver. Reads commands from a file and writes the results to an output file |
 | `listData` | The command file the driver uses |
 | `randomlyUnique.cpp` | My new main program for step 4 |
-| `Linked/` | The linked-list version of the same ADT, kept for comparison (step 2) |
+| `Array/` | The array-based code exactly as it was given to us (untouched) |
+| `Linked/` | The linked-list code exactly as it was given to us (untouched) |
+
+The files at the top level are my working copy of the array version, after the fixes from step 3. I kept the originals in `Array/` and `Linked/` so it is easy to see what changed.
 
 ## How the code is put together (steps 1 and 2)
 
@@ -34,7 +37,7 @@ Things I found:
 1. **`PrintList.cpp` does not compile.** It has no `#include "unsorted.h"` and no `using namespace std`, so `ofstream` and `UnsortedType` are unknown. But `listDriver.cpp` already has its own `PrintList` at the bottom, so even after fixing the includes it would be a duplicate definition. I left `PrintList.cpp` out of the build (it is not needed).
 2. **`exit(2)` without `<cstdlib>`.** g++ lets it through because `<iostream>` pulls it in, but that is not guaranteed on other compilers, so I added `#include <cstdlib>` to `listDriver.cpp`.
 3. **`MAX_ITEMS` was 5.** That is fine for `listData` but the new program needs to hold 50 numbers, so I changed it to 50 in `ItemType.h`. This does change one line of the driver's output: after 5 `PutItem`s the driver now says `List is not full.` instead of `List is full.`
-4. In the linked-list driver (`Linked/listDriver.cpp`) `exit(2)` is missing its semicolon, which is a compile error. I fixed that too and it compiles and runs `listData` fine. Its output is a bit different from the array version: `PrintList` shows `9675` instead of `5769` because the linked `PutItem` inserts at the front, and `IsFull` never says full because it only checks whether `new` still works.
+4. Not part of step 3, but while reading the linked-list driver (`Linked/listDriver.cpp`) I noticed `exit(2)` is missing its semicolon, so that one will not compile as given either. I tried it with the semicolon added and it runs `listData` fine. Its output is a bit different from the array version: `PrintList` shows `9675` instead of `5769` because the linked `PutItem` inserts at the front, and `IsFull` never says full because it only checks whether `new` still works.
 
 Running the driver with `listData` gives the expected results (see the screenshots in the Word document).
 

@@ -38,6 +38,12 @@ cmake --build build
 
 ## How to run
 
+**Note for the VS Code terminal on Windows:** ncurses mode quits straight away with
+`Error opening terminal: xterm-256color` because VS Code sets `TERM` and MSYS2's
+ncurses cannot find its terminfo files from PowerShell. Either clear `TERM` first
+(`$env:TERM = ""`) or run it from a normal PowerShell / Windows Terminal window.
+On Linux this does not happen.
+
 ```
 ./game            shows a menu to pick the mode
 ./game terminal

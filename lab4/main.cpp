@@ -324,6 +324,7 @@ public:
 
     void displaySFML() {
         sf::RenderWindow window(sf::VideoMode(400, 400), "Memory Game");
+        window.setFramerateLimit(30);   // no need to redraw thousands of times a second
         sf::Font font;
         bool haveFont = font.loadFromFile("arial.ttf");
         if (!haveFont) {
